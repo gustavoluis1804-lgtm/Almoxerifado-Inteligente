@@ -19,6 +19,11 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const frontendPath = path.resolve(__dirname, '../frontend');
 
 app.use(cors());
+app.use((_req, res, next) => {
+  res.setHeader('Permissions-Policy', 'camera=(self)');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  next();
+});
 app.use(express.json({ limit: '3mb' }));
 app.use(express.urlencoded({ extended: true }));
 
@@ -46,19 +51,19 @@ app.use((err, _req, res, _next) => {
   const status = err.status || (err.code === '23505' ? 409 : 0)
     || (['23503', '23514', '22P02'].includes(err.code) ? 400 : 0) || 500;
   const friendly = {
-    23505: 'JÃ¡ existe um cadastro com esses dados.',
-    23503: 'O cadastro relacionado nÃ£o existe ou ainda estÃ¡ em uso.',
-    23514: 'Um dos valores informados Ã© invÃ¡lido.',
-    '22P02': 'O identificador informado Ã© invÃ¡lido.',
-    PGRST202: 'As funÃ§Ãµes do banco nÃ£o foram encontradas. Execute database/schema.sql no SQL Editor do Supabase.',
-    '42P01': 'As tabelas do banco nÃ£o foram encontradas. Execute database/schema.sql no SQL Editor do Supabase.',
+    23505: 'Já existe um cadastro com esses dados.',
+    23503: 'O cadastro relacionado não existe ou ainda está em uso.',
+    23514: 'Um dos valores informados é inválido.',
+    '22P02': 'O identificador informado é inválido.',
+    PGRST202: 'As funções do banco não foram encontradas. Execute database/schema.sql no SQL Editor do Supabase.',
+    '42P01': 'As tabelas do banco não foram encontradas. Execute database/schema.sql no SQL Editor do Supabase.',
   }[err.code];
   res.status(status).json({ error: friendly || err.message || 'Erro interno do servidor.' });
 });
 
 const isDirectRun = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 if (isDirectRun) {
-  app.listen(port, () => console.log(`âœ… Almoxerifado SENAI-SP em http://localhost:${port}`));
+  app.listen(port, () => console.log(`✅ Almoxerifado SENAI-SP em http://localhost:${port}`));
 }
 
 export default app;
