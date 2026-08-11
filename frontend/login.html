@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#d71920">
+  <title>Entrar — Almoxarifado SENAI-SP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/login.css">
+  <link rel="stylesheet" href="/css/theme.css">
+  <link rel="stylesheet" href="/css/login-theme.css">
+  <link rel="stylesheet" href="/css/theme-fixes.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="auth-page">
+  <main class="auth-shell">
+    <section class="auth-showcase">
+      <div class="auth-logo">SENAI <span>SP</span></div>
+      <div class="showcase-content">
+        <span class="auth-eyebrow">Gestão inteligente</span>
+        <h1>Controle seu<br>almoxarifado com<br><em>segurança.</em></h1>
+        <p>Estoque, movimentações e rastreabilidade<br>em um só lugar.</p>
+        <div class="auth-benefits">
+          <article><div><i data-lucide="shield-check"></i></div><strong>Segurança</strong><small>Acesso restrito e<br>dados protegidos</small></article>
+          <article><div><i data-lucide="package"></i></div><strong>Controle</strong><small>Gestão completa do<br>seu almoxarifado</small></article>
+          <article><div><i data-lucide="chart-no-axes-combined"></i></div><strong>Eficiência</strong><small>Informações em tempo<br>real para decisões</small></article>
+        </div>
+      </div>
+    </section>
+    <section class="auth-form-side">
+      <div class="auth-form-wrap">
+        <header><span class="auth-eyebrow">Área restrita</span><h2>Bem-vindo <em>de volta!</em></h2><p>Entre com seu usuário criado no Supabase.</p></header>
+        <form id="loginForm" class="auth-form">
+          <div class="auth-field"><label for="email">E-mail</label><div class="auth-input"><span><i data-lucide="mail"></i></span><input id="email" type="email" autocomplete="username" required placeholder="usuario@email.com"></div></div>
+          <div class="auth-field"><label for="password">Senha</label><div class="auth-input"><span><i data-lucide="lock-keyhole"></i></span><input id="password" type="password" autocomplete="current-password" minlength="6" required placeholder="Digite sua senha"><button type="button" id="showPassword"><i data-lucide="eye"></i><b>Mostrar</b></button></div></div>
+          <div class="auth-options"><label><input id="rememberMe" type="checkbox"><span>Lembrar de mim</span></label><button id="forgotPassword" type="button">Esqueceu sua senha?</button></div>
+          <p id="loginError" class="auth-error" role="alert"></p>
+          <button class="auth-submit" type="submit"><i data-lucide="lock-keyhole"></i><span>Entrar no sistema</span></button>
+        </form>
+        <div class="restricted"><span></span><small>Acesso exclusivo para usuários autorizados.</small><span></span></div>
+        <footer><i data-lucide="shield-check"></i><strong>SENAI-SP</strong><span></span><small>Tecnologia e inovação a serviço da indústria</small></footer>
+      </div>
+    </section>
+  </main>
+  <div id="authNotice" class="auth-notice"></div>
+  <script src="/js/api.js"></script>
+  <script src="/js/login.js"></script>
+</body>
+</html>

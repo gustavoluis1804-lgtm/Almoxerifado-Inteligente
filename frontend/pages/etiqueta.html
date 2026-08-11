@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Imprimir QR Code — SENAI-SP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/etiqueta.css">
+  <link rel="stylesheet" href="/css/theme-fixes.css">
+</head>
+<body class="label-page">
+  <main class="label-shell">
+    <header class="label-toolbar">
+      <div><span class="eyebrow">Impressão de etiquetas</span><h1>QR Code do item</h1><p>Escolha o tamanho e a quantidade para itens ou prateleiras.</p></div>
+      <a class="btn btn-secondary" id="backToItem" href="/pages/itens.html">Voltar</a>
+    </header>
+    <section class="label-controls panel">
+      <div class="field"><label for="labelSize">Tamanho</label><select class="select" id="labelSize"><option value="40">Item pequeno — 40 mm</option><option value="60" selected>Item padrão — 60 mm</option><option value="100">Prateleira — 100 mm</option></select></div>
+      <div class="field"><label for="labelQuantity">Quantidade de etiquetas</label><input class="input" id="labelQuantity" type="number" min="1" max="50" value="1"></div>
+      <button class="btn btn-primary" id="printLabels" type="button">Imprimir somente QR Code</button>
+    </section>
+    <div id="labelMessage" class="empty-state">Carregando item...</div>
+    <section class="labels-preview" id="labelsPreview"></section>
+  </main>
+  <script src="/js/api.js"></script>
+  <script src="/js/etiqueta.js"></script>
+</body>
+</html>
