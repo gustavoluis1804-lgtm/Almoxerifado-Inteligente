@@ -59,15 +59,22 @@ function cameraErrorMessage(error) {
 
 function scannerConfig() {
   return {
-    fps: 12,
+    fps: 15,
     qrbox(viewWidth, viewHeight) {
-      const size = Math.floor(Math.min(viewWidth, viewHeight) * 0.72);
-      return { width: Math.max(180, size), height: Math.max(180, size) };
+      const minEdge = Math.min(viewWidth, viewHeight);
+      const size = Math.max(160, Math.min(Math.floor(minEdge * 0.82), minEdge - 16));
+      return { width: size, height: size };
     },
-    aspectRatio: 1,
     disableFlip: false,
-    formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
   };
+}
+
+function createScanner() {
+  return new Html5Qrcode('reader', {
+    formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
+    experimentalFeatures: { useBarCodeDetectorIfSupported: true },
+    verbose: false,
+  });
 }
 
 async function loadCameras() {
@@ -90,6 +97,13 @@ async function refreshTorchSupport() {
   const track = video?.srcObject?.getVideoTracks?.()[0];
   const capabilities = track?.getCapabilities?.();
   if (capabilities?.torch) torchBtn.hidden = false;
+  const advanced = [];
+  if (capabilities?.focusMode?.includes?.('continuous')) advanced.push({ focusMode: 'continuous' });
+  if (capabilities?.exposureMode?.includes?.('continuous')) advanced.push({ exposureMode: 'continuous' });
+  if (capabilities?.whiteBalanceMode?.includes?.('continuous')) advanced.push({ whiteBalanceMode: 'continuous' });
+  if (advanced.length) {
+    try { await track.applyConstraints({ advanced }); } catch (_) {}
+  }
   if (video) {
     video.setAttribute('playsinline', '');
     video.setAttribute('webkit-playsinline', '');
@@ -126,16 +140,32 @@ async function startCamera(cameraOverride = null) {
   startCameraBtn.disabled = true;
   setCameraStatus('Solicitando acesso à câmera...');
   try {
-    if (!qrScanner) qrScanner = new Html5Qrcode('reader', { verbose: false });
+    if (!qrScanner) qrScanner = createScanner();
     let cameraConfig = cameraOverride;
-    if (!cameraConfig) cameraConfig = { facingMode: { ideal: 'environment' } };
+    if (!cameraConfig) {
+      cameraConfig = {
+        facingMode: { ideal: 'environment' },
+        width: { ideal: 1920 },
+        height: { ideal: 1080 },
+        frameRate: { ideal: 30, max: 30 },
+      };
+    }
 
-    await qrScanner.start(cameraConfig, scannerConfig(), onScanSuccess, () => {});
+    try {
+      await qrScanner.start(cameraConfig, scannerConfig(), onScanSuccess, () => {});
+    } catch (firstError) {
+      const denied = firstError?.name === 'NotAllowedError'
+        || /permission|denied/i.test(String(firstError?.message || firstError));
+      if (cameraOverride || denied) throw firstError;
+      await loadCameras();
+      if (!availableCameras.length) throw firstError;
+      await qrScanner.start(availableCameras[currentCameraIndex].id, scannerConfig(), onScanSuccess, () => {});
+    }
     cameraRunning = true;
     scannerStage.classList.add('active');
     startCameraBtn.hidden = true;
     stopCameraBtn.hidden = false;
-    setCameraStatus('Câmera ativa. Centralize o QR Code dentro do quadrado.');
+    setCameraStatus('Câmera ativa. Centralize o QR Code e mantenha o celular firme.');
     await loadCameras();
     await refreshTorchSupport();
   } catch (error) {
@@ -202,7 +232,7 @@ async function scanImage(file) {
   if (!file) return;
   try {
     await stopCamera({ silent: true });
-    if (!qrScanner) qrScanner = new Html5Qrcode('reader', { verbose: false });
+    if (!qrScanner) qrScanner = createScanner();
     setCameraStatus('Lendo o QR Code da imagem...');
     const decoded = await qrScanner.scanFile(file, true);
     await onScanSuccess(decoded);
@@ -289,4 +319,3 @@ document.addEventListener('DOMContentLoaded', () => {
     findSku(preset);
   }
 });
-
