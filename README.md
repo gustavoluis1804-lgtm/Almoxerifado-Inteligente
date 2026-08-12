@@ -18,18 +18,19 @@ O mesmo SQL também cria o bucket público `item-images` e a coluna `imagem_url`
 
 ## 2. Backend
 ```bash
-cd backend
 npm install
 ```
 Copie `.env.example` para `.env` e preencha:
 ```env
 PORT=3000
 SUPABASE_URL=https://seu-projeto.supabase.co
-SUPABASE_SECRET_KEY=sua-chave-server-side
+SUPABASE_SERVICE_ROLE_KEY=sua-chave-service-role
 GEMINI_API_KEY=sua-chave-gemini
 GEMINI_MODEL=gemini-3.5-flash
 ```
-> Nunca coloque `SUPABASE_SECRET_KEY` ou `GEMINI_API_KEY` no frontend/GitHub.
+> Nunca coloque `SUPABASE_SERVICE_ROLE_KEY` ou `GEMINI_API_KEY` no frontend/GitHub.
+
+`SUPABASE_URL` deve ser somente a Project URL base, por exemplo `https://seu-projeto.supabase.co`. Não use `/rest/v1`.
 
 Inicie:
 ```bash
@@ -39,7 +40,7 @@ Abra: `http://localhost:3000`
 
 ## Publicação na Vercel
 
-O projeto inclui `vercel.json` e uma entrada serverless em `api/index.js`. Na Vercel, configure as variáveis `SUPABASE_URL`, `SUPABASE_SECRET_KEY`, `GEMINI_API_KEY` e `GEMINI_MODEL`. Nunca envie o arquivo `backend/.env` ao GitHub.
+O projeto inclui `vercel.json` e uma entrada serverless em `api/index.js`. Na Vercel, configure as variáveis `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `GEMINI_API_KEY` e `GEMINI_MODEL`. Nunca envie o arquivo `.env` ao GitHub.
 
 ## Login
 

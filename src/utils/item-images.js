@@ -1,4 +1,4 @@
-import { supabase } from '../config/supabase.js';
+import { hasServiceRoleKey, supabase } from '../config/supabase.js';
 
 export const ITEM_IMAGES_BUCKET = 'item-images';
 
@@ -27,6 +27,7 @@ export async function withNestedItemImages(records = []) {
 }
 
 export async function ensureImageBucket() {
+  if (!hasServiceRoleKey) return;
   const { error: findError } = await supabase.storage.getBucket(ITEM_IMAGES_BUCKET);
   if (!findError) return;
   const { error } = await supabase.storage.createBucket(ITEM_IMAGES_BUCKET, {
