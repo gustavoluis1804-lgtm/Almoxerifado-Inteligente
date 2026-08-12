@@ -11,7 +11,7 @@ router.use(clearCacheAfterMutation);
 router.get('/', cacheJson(20_000), asyncRoute(async (req, res) => {
   let query = supabase
     .from('movimentacoes')
-    .select('*, itens(id,sku,nome,localizacao,imagem_url)')
+    .select('*, itens(id,sku,nome,localizacao)')
     .order('created_at', { ascending: false });
   if (req.query.tipo) query = query.eq('tipo', req.query.tipo.toUpperCase());
   if (req.query.item_id) query = query.eq('item_id', req.query.item_id);

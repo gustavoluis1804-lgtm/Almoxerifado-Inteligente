@@ -142,14 +142,23 @@ router.post('/:id/imagem', asyncRoute(async (req, res) => {
     throw uploadError;
   }
   const imagem_url = itemImagePublicUrl(item.id);
-  const { data: updated, error: updateError } = await supabase
+  const updatedAt = new Date().toISOString();
+  let update = await supabase
     .from('itens')
-    .update({ imagem_url, updated_at: new Date().toISOString() })
+    .update({ imagem_url, updated_at: updatedAt })
     .eq('id', item.id)
     .select('*')
     .single();
-  if (updateError) throw updateError;
-  res.json(withItemImage(updated));
+  if (update.error?.code === '42703') {
+    update = await supabase
+      .from('itens')
+      .update({ updated_at: updatedAt })
+      .eq('id', item.id)
+      .select('*')
+      .single();
+  }
+  if (update.error) throw update.error;
+  res.json(withItemImage({ ...update.data, imagem_url }));
 }));
 
 export default router;

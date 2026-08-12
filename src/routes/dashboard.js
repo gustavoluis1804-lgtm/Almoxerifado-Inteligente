@@ -9,7 +9,7 @@ router.use(requireSupabase);
 
 async function dashboardData() {
   const [{ data: itens, error: e1 }, { count: movMes, error: e2 }] = await Promise.all([
-    supabase.from('itens').select('id,sku,nome,localizacao,quantidade,estoque_minimo,imagem_url,familia_id,familias(nome),tipos(nome)', { count: 'exact' }).eq('ativo', true),
+    supabase.from('itens').select('id,sku,nome,localizacao,quantidade,estoque_minimo,familia_id,familias(nome),tipos(nome)', { count: 'exact' }).eq('ativo', true),
     supabase.from('movimentacoes').select('id', { head: true, count: 'exact' }).gte('created_at', new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()),
   ]);
   if (e1) throw e1; if (e2) throw e2;
@@ -42,7 +42,7 @@ router.get('/resumo', cacheJson(25_000), asyncRoute(async (_req, res) => {
 router.get('/estoque-baixo', cacheJson(25_000), asyncRoute(async (_req, res) => {
   const { data, error } = await supabase
     .from('itens')
-    .select('id,sku,nome,localizacao,quantidade,estoque_minimo,imagem_url,familias(nome),tipos(nome)')
+    .select('id,sku,nome,localizacao,quantidade,estoque_minimo,familias(nome),tipos(nome)')
     .eq('ativo', true)
     .order('quantidade', { ascending: true });
   if (error) throw error;

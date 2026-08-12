@@ -15,7 +15,7 @@ export function withItemImage(item) {
 
 function withStoredItemImage(item) {
   if (!item?.id) return item;
-  return { ...item, imagem_url: item.imagem_url || null };
+  return { ...item, imagem_url: item.imagem_url || itemImagePublicUrl(item.id) };
 }
 
 export function withNestedItemImage(record) {
