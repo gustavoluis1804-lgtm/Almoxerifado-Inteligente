@@ -1,4 +1,4 @@
-const ASSET_VERSION = '20260812c';
+const ASSET_VERSION = '20260812d';
 
 const imageStyles = document.createElement('link');
 imageStyles.rel = 'stylesheet';
