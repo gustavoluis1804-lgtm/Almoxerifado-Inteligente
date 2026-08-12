@@ -6,7 +6,10 @@ let availableCameras = [];
 let currentCameraIndex = 0;
 let torchEnabled = false;
 let scanLocked = false;
+let scannerLibraryPromise = null;
 
+const entradaBtn = document.getElementById('entradaBtn');
+const saidaBtn = document.getElementById('saidaBtn');
 const startCameraBtn = document.getElementById('startCameraBtn');
 const stopCameraBtn = document.getElementById('stopCameraBtn');
 const switchCameraBtn = document.getElementById('switchCameraBtn');
@@ -14,6 +17,23 @@ const torchBtn = document.getElementById('torchBtn');
 const cameraStatus = document.getElementById('cameraStatus');
 const scannerStage = document.getElementById('scannerStage');
 const qrImageInput = document.getElementById('qrImageInput');
+const manualSku = document.getElementById('manualSku');
+const manualBtn = document.getElementById('manualBtn');
+const scanResult = document.getElementById('scanResult');
+
+function loadScannerLibrary() {
+  if (window.Html5Qrcode && window.Html5QrcodeSupportedFormats) return Promise.resolve();
+  if (scannerLibraryPromise) return scannerLibraryPromise;
+  scannerLibraryPromise = new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js';
+    script.async = true;
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error('N\u00e3o foi poss\u00edvel carregar o leitor de QR Code. Confira a conex\u00e3o e tente novamente.'));
+    document.head.appendChild(script);
+  });
+  return scannerLibraryPromise;
+}
 
 function updateMode() {
   entradaBtn.classList.toggle('active', modo === 'entrada');
@@ -21,6 +41,15 @@ function updateMode() {
   document.body.dataset.page = modo;
   document.querySelectorAll('.nav-list a').forEach((link) => link.classList.remove('active'));
   document.querySelector(`[data-nav="${modo}"]`)?.classList.add('active');
+}
+
+function setMode(nextMode) {
+  modo = nextMode;
+  const params = new URLSearchParams(location.search);
+  params.set('modo', modo);
+  history.replaceState(null, '', `?${params.toString()}`);
+  updateMode();
+  renderItem();
 }
 
 function setCameraStatus(message, type = 'idle') {
@@ -44,25 +73,25 @@ function cameraErrorMessage(error) {
   const name = error?.name || '';
   const message = String(error?.message || error || '').toLowerCase();
   if (name === 'NotAllowedError' || message.includes('permission') || message.includes('denied')) {
-    return 'A câmera foi bloqueada. Permita a câmera nas configurações do navegador e tente novamente.';
+    return 'A c\u00e2mera foi bloqueada. Permita a c\u00e2mera no navegador e tente novamente.';
   }
   if (name === 'NotFoundError' || message.includes('not found') || message.includes('no camera')) {
-    return 'Nenhuma câmera foi encontrada neste aparelho.';
+    return 'Nenhuma c\u00e2mera foi encontrada neste aparelho.';
   }
   if (name === 'NotReadableError' || message.includes('could not start') || message.includes('notreadable')) {
-    return 'A câmera está sendo usada por outro aplicativo. Feche outros apps e tente novamente.';
+    return 'A c\u00e2mera est\u00e1 sendo usada por outro aplicativo. Feche outros apps e tente novamente.';
   }
-  if (name === 'OverconstrainedError') return 'A câmera traseira não está disponível. Tentando outra câmera pode resolver.';
-  if (name === 'SecurityError' || !window.isSecureContext) return 'A câmera exige uma conexão segura HTTPS.';
-  return 'Não foi possível iniciar a câmera. Confira a permissão e tente novamente.';
+  if (name === 'OverconstrainedError') return 'A c\u00e2mera traseira n\u00e3o est\u00e1 dispon\u00edvel. Use o bot\u00e3o Trocar c\u00e2mera.';
+  if (name === 'SecurityError' || !window.isSecureContext) return 'A c\u00e2mera exige HTTPS ou localhost.';
+  return 'N\u00e3o foi poss\u00edvel iniciar a c\u00e2mera. Confira a permiss\u00e3o e tente novamente.';
 }
 
 function scannerConfig() {
   return {
-    fps: 15,
+    fps: 10,
     qrbox(viewWidth, viewHeight) {
       const minEdge = Math.min(viewWidth, viewHeight);
-      const size = Math.max(160, Math.min(Math.floor(minEdge * 0.82), minEdge - 16));
+      const size = Math.max(170, Math.min(Math.floor(minEdge * 0.78), minEdge - 20));
       return { width: size, height: size };
     },
     disableFlip: false,
@@ -79,6 +108,7 @@ function createScanner() {
 
 async function loadCameras() {
   try {
+    await loadScannerLibrary();
     availableCameras = await Html5Qrcode.getCameras();
   } catch (_) {
     availableCameras = [];
@@ -97,6 +127,7 @@ async function refreshTorchSupport() {
   const track = video?.srcObject?.getVideoTracks?.()[0];
   const capabilities = track?.getCapabilities?.();
   if (capabilities?.torch) torchBtn.hidden = false;
+
   const advanced = [];
   if (capabilities?.focusMode?.includes?.('continuous')) advanced.push({ focusMode: 'continuous' });
   if (capabilities?.exposureMode?.includes?.('continuous')) advanced.push({ exposureMode: 'continuous' });
@@ -123,33 +154,33 @@ async function stopCamera({ silent = false } = {}) {
   switchCameraBtn.hidden = true;
   torchBtn.hidden = true;
   torchEnabled = false;
-  if (!silent) setCameraStatus('Câmera pausada. Toque em Abrir câmera para continuar.');
+  if (!silent) setCameraStatus('C\u00e2mera pausada. Toque em Abrir c\u00e2mera para continuar.');
 }
 
 async function startCamera(cameraOverride = null) {
   if (cameraRunning) return;
   if (!window.isSecureContext) {
-    setCameraStatus('A câmera só funciona em conexão segura HTTPS.', 'error');
+    setCameraStatus('A c\u00e2mera s\u00f3 funciona em HTTPS ou localhost.', 'error');
     return;
   }
+
+  try {
+    await loadScannerLibrary();
+  } catch (error) {
+    setCameraStatus(error.message, 'error');
+    return;
+  }
+
   if (!navigator.mediaDevices?.getUserMedia || !window.Html5Qrcode) {
-    setCameraStatus('Este navegador não oferece suporte à leitura pela câmera. Use Chrome ou Safari atualizado.', 'error');
+    setCameraStatus('Este navegador n\u00e3o oferece suporte \u00e0 leitura pela c\u00e2mera. Use Chrome, Edge, Safari ou Firefox atualizado.', 'error');
     return;
   }
 
   startCameraBtn.disabled = true;
-  setCameraStatus('Solicitando acesso à câmera...');
+  setCameraStatus('Solicitando acesso \u00e0 c\u00e2mera...');
   try {
     if (!qrScanner) qrScanner = createScanner();
-    let cameraConfig = cameraOverride;
-    if (!cameraConfig) {
-      cameraConfig = {
-        facingMode: { ideal: 'environment' },
-        width: { ideal: 1920 },
-        height: { ideal: 1080 },
-        frameRate: { ideal: 30, max: 30 },
-      };
-    }
+    let cameraConfig = cameraOverride || { facingMode: { ideal: 'environment' } };
 
     try {
       await qrScanner.start(cameraConfig, scannerConfig(), onScanSuccess, () => {});
@@ -159,13 +190,15 @@ async function startCamera(cameraOverride = null) {
       if (cameraOverride || denied) throw firstError;
       await loadCameras();
       if (!availableCameras.length) throw firstError;
-      await qrScanner.start(availableCameras[currentCameraIndex].id, scannerConfig(), onScanSuccess, () => {});
+      cameraConfig = availableCameras[currentCameraIndex].id;
+      await qrScanner.start(cameraConfig, scannerConfig(), onScanSuccess, () => {});
     }
+
     cameraRunning = true;
     scannerStage.classList.add('active');
     startCameraBtn.hidden = true;
     stopCameraBtn.hidden = false;
-    setCameraStatus('Câmera ativa. Centralize o QR Code e mantenha o celular firme.');
+    setCameraStatus('C\u00e2mera ativa. Centralize o QR Code dentro do quadro.');
     await loadCameras();
     await refreshTorchSupport();
   } catch (error) {
@@ -198,7 +231,7 @@ async function toggleTorch() {
     window.lucide?.createIcons();
   } catch (_) {
     torchBtn.hidden = true;
-    toast('A lanterna não é compatível com esta câmera.', 'error');
+    toast('A lanterna n\u00e3o \u00e9 compat\u00edvel com esta c\u00e2mera.', 'error');
   }
 }
 
@@ -231,25 +264,23 @@ async function onScanSuccess(decodedText) {
 async function scanImage(file) {
   if (!file) return;
   try {
+    await loadScannerLibrary();
     await stopCamera({ silent: true });
     if (!qrScanner) qrScanner = createScanner();
     setCameraStatus('Lendo o QR Code da imagem...');
     const decoded = await qrScanner.scanFile(file, true);
     await onScanSuccess(decoded);
   } catch (_) {
-    setCameraStatus('Não foi possível encontrar um QR Code nessa imagem.', 'error');
+    setCameraStatus('N\u00e3o foi poss\u00edvel encontrar um QR Code nessa imagem.', 'error');
   } finally {
     qrImageInput.value = '';
   }
 }
 
-entradaBtn.onclick = () => { modo = 'entrada'; updateMode(); renderItem(); };
-saidaBtn.onclick = () => { modo = 'saida'; updateMode(); renderItem(); };
-
 async function findSku(value) {
   const sku = normalizeSku(value);
   if (!/^\d{3}\.\d{3}\.\d{4}$/.test(sku)) {
-    toast('QR Code/SKU fora do padrão FFF.TTT.PPPP.', 'error');
+    toast('QR Code/SKU fora do padr\u00e3o FFF.TTT.PPPP.', 'error');
     return;
   }
   manualSku.value = sku;
@@ -266,9 +297,13 @@ async function findSku(value) {
 
 function renderItem() {
   if (!currentItem) return;
-  scanResult.innerHTML = `<section class="panel scan-item-result">${itemThumb(currentItem.imagem_url,currentItem.nome,'scanner-item-photo')}<span class="eyebrow">${modo === 'entrada' ? 'Registrar entrada' : 'Registrar saída'}</span><h2>${esc(currentItem.nome)}</h2><p class="muted">${esc(currentItem.sku)} · ${esc(currentItem.localizacao)}</p><div class="cards-4 scan-stock-cards"><div class="stat-card"><div class="label">Saldo atual</div><div class="value">${currentItem.quantidade}</div></div><div class="stat-card"><div class="label">Estoque mínimo</div><div class="value">${currentItem.estoque_minimo}</div></div></div><form id="moveForm" class="form-grid"><div class="field"><label>Quantidade ${modo === 'entrada' ? 'adicionada' : 'retirada'} *</label><input class="input" id="moveQtd" type="number" inputmode="numeric" min="1" value="1" required></div><div class="field"><label>Responsável *</label><input class="input" id="moveResp" required autocomplete="name" placeholder="Nome do responsável"></div><div class="field full"><label>${modo === 'entrada' ? 'Observação' : 'Motivo da retirada'} ${modo === 'saida' ? '*' : ''}</label><textarea class="textarea" id="moveMotivo" ${modo === 'saida' ? 'required' : ''}></textarea></div><div class="field full scan-form-actions"><button class="btn btn-primary" type="submit">Confirmar ${modo === 'entrada' ? 'Entrada' : 'Retirada'}</button><button class="btn btn-secondary" id="scanAnotherBtn" type="button"><i data-lucide="scan-line"></i>Escanear outro</button></div></form></section>`;
-  moveForm.onsubmit = submitMove;
-  scanAnotherBtn.onclick = () => { currentItem = null; scanResult.innerHTML = ''; startCamera(); };
+  scanResult.innerHTML = `<section class="panel scan-item-result">${itemThumb(currentItem.imagem_url, currentItem.nome, 'scanner-item-photo')}<span class="eyebrow">${modo === 'entrada' ? 'Registrar entrada' : 'Registrar sa\u00edda'}</span><h2>${esc(currentItem.nome)}</h2><p class="muted">${esc(currentItem.sku)} - ${esc(currentItem.localizacao)}</p><div class="cards-4 scan-stock-cards"><div class="stat-card"><div class="label">Saldo atual</div><div class="value">${currentItem.quantidade}</div></div><div class="stat-card"><div class="label">Estoque m\u00ednimo</div><div class="value">${currentItem.estoque_minimo}</div></div></div><form id="moveForm" class="form-grid"><div class="field"><label>Quantidade ${modo === 'entrada' ? 'adicionada' : 'retirada'} *</label><input class="input" id="moveQtd" type="number" inputmode="numeric" min="1" value="1" required></div><div class="field"><label>Respons\u00e1vel *</label><input class="input" id="moveResp" required autocomplete="name" placeholder="Nome do respons\u00e1vel"></div><div class="field full"><label>${modo === 'entrada' ? 'Observa\u00e7\u00e3o' : 'Motivo da retirada'} ${modo === 'saida' ? '*' : ''}</label><textarea class="textarea" id="moveMotivo" ${modo === 'saida' ? 'required' : ''}></textarea></div><div class="field full scan-form-actions"><button class="btn btn-primary" type="submit">Confirmar ${modo === 'entrada' ? 'Entrada' : 'Retirada'}</button><button class="btn btn-secondary" id="scanAnotherBtn" type="button"><i data-lucide="scan-line"></i>Escanear outro</button></div></form></section>`;
+  document.getElementById('moveForm').addEventListener('submit', submitMove);
+  document.getElementById('scanAnotherBtn').addEventListener('click', () => {
+    currentItem = null;
+    scanResult.innerHTML = '';
+    startCamera();
+  });
   window.lucide?.createIcons();
 }
 
@@ -279,12 +314,12 @@ async function submitMove(event) {
   try {
     await API.post(`/movimentacoes/${modo}`, {
       item_id: currentItem.id,
-      quantidade: Number(moveQtd.value),
-      responsavel: moveResp.value,
-      motivo: moveMotivo.value,
+      quantidade: Number(document.getElementById('moveQtd').value),
+      responsavel: document.getElementById('moveResp').value,
+      motivo: document.getElementById('moveMotivo').value,
     });
-    toast(`${modo === 'entrada' ? 'Entrada' : 'Saída'} registrada com sucesso!`);
-    currentItem = await API.get(`/itens/sku/${encodeURIComponent(currentItem.sku)}`);
+    toast(`${modo === 'entrada' ? 'Entrada' : 'Sa\u00edda'} registrada com sucesso!`);
+    currentItem = await API.get(`/itens/sku/${encodeURIComponent(currentItem.sku)}`, { cache: false });
     renderItem();
   } catch (error) {
     toast(error.message, 'error');
@@ -293,18 +328,20 @@ async function submitMove(event) {
   }
 }
 
-startCameraBtn.onclick = () => startCamera();
-stopCameraBtn.onclick = () => stopCamera();
-switchCameraBtn.onclick = switchCamera;
-torchBtn.onclick = toggleTorch;
-qrImageInput.onchange = () => scanImage(qrImageInput.files?.[0]);
-manualBtn.onclick = () => findSku(manualSku.value);
-manualSku.onkeydown = (event) => {
+entradaBtn.addEventListener('click', () => setMode('entrada'));
+saidaBtn.addEventListener('click', () => setMode('saida'));
+startCameraBtn.addEventListener('click', () => startCamera());
+stopCameraBtn.addEventListener('click', () => stopCamera());
+switchCameraBtn.addEventListener('click', switchCamera);
+torchBtn.addEventListener('click', toggleTorch);
+qrImageInput.addEventListener('change', () => scanImage(qrImageInput.files?.[0]));
+manualBtn.addEventListener('click', () => findSku(manualSku.value));
+manualSku.addEventListener('keydown', (event) => {
   if (event.key === 'Enter') {
     event.preventDefault();
     findSku(manualSku.value);
   }
-};
+});
 
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) stopCamera({ silent: true });

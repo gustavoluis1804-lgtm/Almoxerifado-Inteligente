@@ -2,28 +2,32 @@ import { hasServiceRoleKey, supabase } from '../config/supabase.js';
 
 export const ITEM_IMAGES_BUCKET = 'item-images';
 
+export function itemImagePublicUrl(itemId) {
+  if (!itemId) return null;
+  const { data } = supabase.storage.from(ITEM_IMAGES_BUCKET).getPublicUrl(`${itemId}/foto.webp`);
+  return data.publicUrl;
+}
+
 export function withItemImage(item) {
   if (!item?.id) return item;
-  const { data } = supabase.storage.from(ITEM_IMAGES_BUCKET).getPublicUrl(`${item.id}/foto.webp`);
-  return { ...item, imagem_url: data.publicUrl };
+  return { ...item, imagem_url: item.imagem_url || itemImagePublicUrl(item.id) };
+}
+
+function withStoredItemImage(item) {
+  if (!item?.id) return item;
+  return { ...item, imagem_url: item.imagem_url || null };
 }
 
 export function withNestedItemImage(record) {
-  return record ? { ...record, itens: withItemImage(record.itens) } : record;
+  return record ? { ...record, itens: withStoredItemImage(record.itens) } : record;
 }
 
 export async function withItemImages(items = []) {
-  const { data, error } = await supabase.storage.from(ITEM_IMAGES_BUCKET).list('', { limit: 1000 });
-  if (error) return items.map(item => ({ ...item, imagem_url: null }));
-  const storedIds = new Set(data.map(entry => entry.name));
-  return items.map(item => storedIds.has(item?.id) ? withItemImage(item) : { ...item, imagem_url: null });
+  return items.map(withStoredItemImage);
 }
 
 export async function withNestedItemImages(records = []) {
-  const items = records.map(record => record.itens).filter(Boolean);
-  const enriched = await withItemImages(items);
-  const byId = new Map(enriched.map(item => [item.id, item]));
-  return records.map(record => ({ ...record, itens: record.itens ? byId.get(record.itens.id) || record.itens : record.itens }));
+  return records.map(withNestedItemImage);
 }
 
 export async function ensureImageBucket() {

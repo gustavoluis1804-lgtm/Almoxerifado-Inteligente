@@ -9,7 +9,7 @@ router.use(requireSupabase);
 router.get('/', asyncRoute(async (req, res) => {
   let query = supabase
     .from('movimentacoes')
-    .select('*, itens(id,sku,nome,localizacao)')
+    .select('*, itens(id,sku,nome,localizacao,imagem_url)')
     .order('created_at', { ascending: false });
   if (req.query.tipo) query = query.eq('tipo', req.query.tipo.toUpperCase());
   if (req.query.item_id) query = query.eq('item_id', req.query.item_id);

@@ -1,0 +1,187 @@
+.btn:disabled,
+.icon-btn:disabled {
+  cursor: wait;
+  opacity: .58;
+  transform: none;
+}
+
+.btn,
+.icon-btn,
+.input,
+.select,
+.textarea,
+.panel,
+.stat-card {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.panel,
+.stat-card,
+.global-search,
+.icon-btn {
+  box-shadow: 0 10px 28px rgba(0, 0, 0, .12);
+}
+
+.data-table td {
+  vertical-align: middle;
+}
+
+.data-table tr {
+  content-visibility: auto;
+  contain-intrinsic-size: 64px;
+}
+
+.item-thumb-empty,
+.notification-photo.item-thumb-empty,
+.scanner-item-photo.item-thumb-empty {
+  display: inline-grid;
+  place-items: center;
+  background: linear-gradient(135deg, #18212c, #10161e);
+  border: 1px solid #2b3440;
+  color: #aab5c4;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.scanner-box {
+  max-width: 1040px;
+}
+
+.scanner-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(280px, .75fr);
+  grid-template-areas:
+    "toolbar toolbar"
+    "status status"
+    "stage manual"
+    "stage alternatives"
+    "stage help";
+  gap: 14px;
+  align-items: start;
+}
+
+.camera-toolbar {
+  grid-area: toolbar;
+  margin-bottom: 0;
+}
+
+.camera-status {
+  grid-area: status;
+  margin-bottom: 0;
+}
+
+.scanner-stage {
+  grid-area: stage;
+  min-height: 360px;
+  border-radius: 16px;
+  background: radial-gradient(circle at 50% 45%, rgba(215, 25, 32, .22), rgba(14, 19, 27, .95) 42%, #05070a 78%);
+}
+
+.scanner-stage #reader,
+.scanner-stage #reader video {
+  min-height: 360px;
+}
+
+.manual-sku-field,
+.scanner-alternatives,
+.camera-help {
+  background: #0d131b;
+  border: 1px solid #26313d;
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.manual-sku-field {
+  grid-area: manual;
+  border-top: 1px solid #26313d;
+}
+
+.scanner-alternatives {
+  grid-area: alternatives;
+  margin: 0;
+}
+
+.camera-help {
+  grid-area: help;
+  margin-top: 0;
+}
+
+.camera-help[open] {
+  border-color: #3a4654;
+}
+
+.scanner-guide {
+  border-color: rgba(255, 255, 255, .9);
+  box-shadow: 0 0 0 999px rgba(0, 0, 0, .22), 0 0 26px rgba(215, 25, 32, .22);
+}
+
+.scan-item-result {
+  border-color: #3a2429;
+  background: linear-gradient(135deg, rgba(215, 25, 32, .12), #10151c 36%);
+}
+
+body[data-theme="light"] .manual-sku-field,
+body[data-theme="light"] .scanner-alternatives,
+body[data-theme="light"] .camera-help {
+  background: #fff;
+  border-color: #d8dee5;
+}
+
+@media (max-width: 900px) {
+  .scanner-panel {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "toolbar"
+      "status"
+      "stage"
+      "manual"
+      "alternatives"
+      "help";
+  }
+
+  .scanner-stage,
+  .scanner-stage #reader,
+  .scanner-stage #reader video {
+    min-height: 320px;
+  }
+}
+
+@media (max-width: 760px) {
+  .panel,
+  .stat-card,
+  .global-search,
+  .icon-btn {
+    box-shadow: none;
+  }
+
+  .scanner-panel {
+    gap: 11px;
+  }
+
+  .manual-sku-field,
+  .scanner-alternatives,
+  .camera-help {
+    padding: 12px;
+  }
+
+  .camera-toolbar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .camera-toolbar #startCameraBtn {
+    grid-column: 1 / -1;
+  }
+
+  .camera-toolbar .btn {
+    min-width: 0;
+  }
+
+  .scanner-stage,
+  .scanner-stage #reader,
+  .scanner-stage #reader video {
+    min-height: 300px;
+  }
+}

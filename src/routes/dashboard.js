@@ -27,7 +27,7 @@ router.get('/resumo', asyncRoute(async (_req, res) => {
 router.get('/estoque-baixo', asyncRoute(async (_req, res) => {
   const { data, error } = await supabase
     .from('itens')
-    .select('id,sku,nome,localizacao,quantidade,estoque_minimo,familias(nome),tipos(nome)')
+    .select('id,sku,nome,localizacao,quantidade,estoque_minimo,imagem_url,familias(nome),tipos(nome)')
     .eq('ativo', true)
     .order('quantidade', { ascending: true });
   if (error) throw error;

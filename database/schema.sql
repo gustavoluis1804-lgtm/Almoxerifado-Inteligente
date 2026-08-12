@@ -59,8 +59,13 @@ create table if not exists public.movimentacoes (
 
 create index if not exists idx_itens_sku on public.itens(sku);
 create index if not exists idx_itens_nome on public.itens using gin (to_tsvector('portuguese', nome));
+create index if not exists idx_itens_ativo_created_at on public.itens(ativo, created_at desc);
+create index if not exists idx_itens_familia_ativo on public.itens(familia_id, ativo);
+create index if not exists idx_itens_tipo_ativo on public.itens(tipo_id, ativo);
+create index if not exists idx_itens_estoque_ativo on public.itens(ativo, quantidade, estoque_minimo);
 create index if not exists idx_movimentacoes_created_at on public.movimentacoes(created_at desc);
 create index if not exists idx_movimentacoes_item on public.movimentacoes(item_id);
+create index if not exists idx_movimentacoes_tipo_created_at on public.movimentacoes(tipo, created_at desc);
 
 -- Cria o item e gera o próximo SKU FFF.TTT.PPPP no banco.
 create or replace function public.criar_item_com_sku(

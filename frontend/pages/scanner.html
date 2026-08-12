@@ -1,57 +1,67 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <title>Scanner QR — SENAI-SP</title>
+  <title>Scanner QR &mdash; SENAI-SP</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#d71920">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://unpkg.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="stylesheet" href="/css/style.css">
-  <link rel="stylesheet" href="/css/images.css?v=4">
+  <link rel="stylesheet" href="/css/images.css">
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 </head>
 <body data-page="entrada">
   <div class="app-shell">
     <aside class="sidebar" id="sidebar">
-      <div class="brand"><div class="senai-logo">SENAI<span>SP</span></div><small>Almoxerifado Inteligente</small></div>
+      <div class="brand">
+        <div class="senai-logo">SENAI<span>SP</span></div>
+        <small>Almoxerifado Inteligente</small>
+      </div>
       <nav class="nav-list">
         <a href="/" data-nav="dashboard"><i data-lucide="layout-dashboard"></i>Dashboard</a>
         <a href="/pages/itens.html" data-nav="itens"><i data-lucide="package-search"></i>Itens</a>
-        <a href="/pages/familias.html" data-nav="familias"><i data-lucide="layers-3"></i>Famílias e Tipos</a>
+        <a href="/pages/familias.html" data-nav="familias"><i data-lucide="layers-3"></i>Fam&iacute;lias e Tipos</a>
         <a href="/pages/scanner.html?modo=entrada" data-nav="entrada"><i data-lucide="log-in"></i>Entradas</a>
-        <a href="/pages/scanner.html?modo=saida" data-nav="saida"><i data-lucide="log-out"></i>Saídas</a>
-        <a href="/pages/movimentacoes.html" data-nav="movimentacoes"><i data-lucide="arrow-left-right"></i>Movimentações</a>
-        <a href="/pages/relatorios.html" data-nav="relatorios"><i data-lucide="chart-no-axes-combined"></i>Relatórios</a>
+        <a href="/pages/scanner.html?modo=saida" data-nav="saida"><i data-lucide="log-out"></i>Sa&iacute;das</a>
+        <a href="/pages/movimentacoes.html" data-nav="movimentacoes"><i data-lucide="arrow-left-right"></i>Movimenta&ccedil;&otilde;es</a>
+        <a href="/pages/relatorios.html" data-nav="relatorios"><i data-lucide="chart-no-axes-combined"></i>Relat&oacute;rios</a>
         <a href="/pages/ai.html" data-nav="ia"><i data-lucide="sparkles"></i>Assistente IA <span class="new-pill">Gemini</span></a>
       </nav>
-      <div class="sidebar-user"><div class="avatar">GM</div><div><strong>Gustavo</strong><small>Administrador</small></div></div>
+      <div class="sidebar-user">
+        <div class="avatar">GM</div>
+        <div><strong>Gustavo</strong><small>Administrador</small></div>
+      </div>
     </aside>
 
     <main class="main-area">
       <header class="topbar">
         <button class="icon-btn mobile-only" id="menuBtn" aria-label="Abrir menu"><i data-lucide="menu"></i></button>
-        <div class="global-search"><i data-lucide="search"></i><input id="globalSearch" placeholder="Buscar itens, códigos, famílias..."></div>
-        <div class="top-actions"><button class="icon-btn"><i data-lucide="bell"></i><span class="dot"></span></button><div class="user-chip"><div class="avatar small">GM</div><div><strong>Gustavo</strong><small>Administrador</small></div></div></div>
+        <div class="global-search"><i data-lucide="search"></i><input id="globalSearch" placeholder="Buscar itens, c&oacute;digos, fam&iacute;lias..."></div>
+        <div class="top-actions">
+          <button class="icon-btn"><i data-lucide="bell"></i><span class="dot"></span></button>
+          <div class="user-chip"><div class="avatar small">GM</div><div><strong>Gustavo</strong><small>Administrador</small></div></div>
+        </div>
       </header>
 
       <section class="page-wrap">
         <div class="scanner-box">
-          <span class="eyebrow">Operação mobile</span>
+          <span class="eyebrow">Opera&ccedil;&atilde;o mobile</span>
           <h1 class="page-title">Escanear QR Code</h1>
-          <p class="page-subtitle">Use a câmera traseira do celular, envie uma foto ou informe o SKU manualmente.</p>
+          <p class="page-subtitle">Use a c&acirc;mera traseira do celular, envie uma foto ou informe o SKU manualmente.</p>
 
           <div class="mode-switch">
-            <button id="entradaBtn">📥 Entrada</button>
-            <button id="saidaBtn">📤 Saída</button>
+            <button id="entradaBtn" type="button"><i data-lucide="log-in"></i>Entrada</button>
+            <button id="saidaBtn" type="button"><i data-lucide="log-out"></i>Sa&iacute;da</button>
           </div>
 
           <section class="panel scanner-panel">
             <div class="camera-toolbar">
-              <button class="btn btn-primary" id="startCameraBtn" type="button"><i data-lucide="camera"></i>Abrir câmera</button>
+              <button class="btn btn-primary" id="startCameraBtn" type="button"><i data-lucide="camera"></i>Abrir c&acirc;mera</button>
               <button class="btn btn-secondary" id="switchCameraBtn" type="button" hidden><i data-lucide="switch-camera"></i>Trocar</button>
               <button class="btn btn-secondary" id="torchBtn" type="button" hidden><i data-lucide="flashlight"></i>Lanterna</button>
               <button class="btn btn-ghost" id="stopCameraBtn" type="button" hidden><i data-lucide="square"></i>Parar</button>
@@ -59,35 +69,35 @@
 
             <div class="camera-status" id="cameraStatus" role="status" aria-live="polite">
               <i data-lucide="scan-line"></i>
-              <span>Toque em <strong>Abrir câmera</strong> e permita o acesso quando o celular solicitar.</span>
+              <span>Toque em <strong>Abrir c&acirc;mera</strong> e permita o acesso quando o celular solicitar.</span>
             </div>
 
             <div class="scanner-stage" id="scannerStage">
-              <div id="reader" aria-label="Visualização da câmera para leitura do QR Code"></div>
+              <div id="reader" aria-label="Visualizacao da camera para leitura do QR Code"></div>
               <div class="scanner-guide" aria-hidden="true"><span></span></div>
             </div>
 
             <div class="scanner-alternatives">
               <label class="btn btn-secondary scan-file-btn" for="qrImageInput"><i data-lucide="image-up"></i>Ler QR de uma foto</label>
               <input id="qrImageInput" type="file" accept="image/*" hidden>
-              <small>Útil quando a câmera estiver bloqueada ou o QR estiver em outra tela.</small>
+              <small>Use essa op&ccedil;&atilde;o quando o QR estiver em outra tela ou quando o navegador bloquear a c&acirc;mera.</small>
             </div>
 
             <div class="field manual-sku-field">
               <label for="manualSku">Ou digite o SKU</label>
               <div class="manual-sku-row">
                 <input class="input" id="manualSku" inputmode="decimal" autocomplete="off" placeholder="001.001.0042">
-                <button class="btn btn-secondary" id="manualBtn" type="button">Buscar</button>
+                <button class="btn btn-secondary" id="manualBtn" type="button"><i data-lucide="search"></i>Buscar</button>
               </div>
             </div>
 
             <details class="camera-help">
-              <summary>A câmera não abriu?</summary>
+              <summary>A c&acirc;mera n&atilde;o abriu?</summary>
               <ol>
-                <li>Abra este site diretamente no Chrome ou Safari.</li>
-                <li>Toque no cadeado da barra de endereço e permita a câmera.</li>
-                <li>No iPhone, use Safari; no Android, prefira Chrome.</li>
-                <li>Atualize a página e toque novamente em “Abrir câmera”.</li>
+                <li>Abra este site diretamente no Chrome, Edge ou Safari.</li>
+                <li>Toque no cadeado da barra de endere&ccedil;o e permita a c&acirc;mera.</li>
+                <li>No celular, mantenha o site em HTTPS e evite abrir dentro de outro aplicativo.</li>
+                <li>Atualize a p&aacute;gina e toque novamente em Abrir c&acirc;mera.</li>
               </ol>
             </details>
           </section>
@@ -101,112 +111,6 @@
   <div id="toast" class="toast"></div>
   <script src="/js/api.js"></script>
   <script src="/js/app.js"></script>
-  <script src="/js/scanner.js?v=4"></script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <title>Scanner QR — SENAI-SP</title>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#d71920">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <link rel="stylesheet" href="/css/style.css">
-  <link rel="stylesheet" href="/css/images.css?v=3">
-  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-</head>
-<body data-page="entrada">
-  <div class="app-shell">
-    <aside class="sidebar" id="sidebar">
-      <div class="brand"><div class="senai-logo">SENAI<span>SP</span></div><small>Almoxerifado Inteligente</small></div>
-      <nav class="nav-list">
-        <a href="/" data-nav="dashboard"><i data-lucide="layout-dashboard"></i>Dashboard</a>
-        <a href="/pages/itens.html" data-nav="itens"><i data-lucide="package-search"></i>Itens</a>
-        <a href="/pages/familias.html" data-nav="familias"><i data-lucide="layers-3"></i>Famílias e Tipos</a>
-        <a href="/pages/scanner.html?modo=entrada" data-nav="entrada"><i data-lucide="log-in"></i>Entradas</a>
-        <a href="/pages/scanner.html?modo=saida" data-nav="saida"><i data-lucide="log-out"></i>Saídas</a>
-        <a href="/pages/movimentacoes.html" data-nav="movimentacoes"><i data-lucide="arrow-left-right"></i>Movimentações</a>
-        <a href="/pages/relatorios.html" data-nav="relatorios"><i data-lucide="chart-no-axes-combined"></i>Relatórios</a>
-        <a href="/pages/ai.html" data-nav="ia"><i data-lucide="sparkles"></i>Assistente IA <span class="new-pill">Gemini</span></a>
-      </nav>
-      <div class="sidebar-user"><div class="avatar">GM</div><div><strong>Gustavo</strong><small>Administrador</small></div></div>
-    </aside>
-
-    <main class="main-area">
-      <header class="topbar">
-        <button class="icon-btn mobile-only" id="menuBtn" aria-label="Abrir menu"><i data-lucide="menu"></i></button>
-        <div class="global-search"><i data-lucide="search"></i><input id="globalSearch" placeholder="Buscar itens, códigos, famílias..."></div>
-        <div class="top-actions"><button class="icon-btn"><i data-lucide="bell"></i><span class="dot"></span></button><div class="user-chip"><div class="avatar small">GM</div><div><strong>Gustavo</strong><small>Administrador</small></div></div></div>
-      </header>
-
-      <section class="page-wrap">
-        <div class="scanner-box">
-          <span class="eyebrow">Operação mobile</span>
-          <h1 class="page-title">Escanear QR Code</h1>
-          <p class="page-subtitle">Use a câmera traseira do celular, envie uma foto ou informe o SKU manualmente.</p>
-
-          <div class="mode-switch">
-            <button id="entradaBtn">📥 Entrada</button>
-            <button id="saidaBtn">📤 Saída</button>
-          </div>
-
-          <section class="panel scanner-panel">
-            <div class="camera-toolbar">
-              <button class="btn btn-primary" id="startCameraBtn" type="button"><i data-lucide="camera"></i>Abrir câmera</button>
-              <button class="btn btn-secondary" id="switchCameraBtn" type="button" hidden><i data-lucide="switch-camera"></i>Trocar</button>
-              <button class="btn btn-secondary" id="torchBtn" type="button" hidden><i data-lucide="flashlight"></i>Lanterna</button>
-              <button class="btn btn-ghost" id="stopCameraBtn" type="button" hidden><i data-lucide="square"></i>Parar</button>
-            </div>
-
-            <div class="camera-status" id="cameraStatus" role="status" aria-live="polite">
-              <i data-lucide="scan-line"></i>
-              <span>Toque em <strong>Abrir câmera</strong> e permita o acesso quando o celular solicitar.</span>
-            </div>
-
-            <div class="scanner-stage" id="scannerStage">
-              <div id="reader" aria-label="Visualização da câmera para leitura do QR Code"></div>
-              <div class="scanner-guide" aria-hidden="true"><span></span></div>
-            </div>
-
-            <div class="scanner-alternatives">
-              <label class="btn btn-secondary scan-file-btn" for="qrImageInput"><i data-lucide="image-up"></i>Ler QR de uma foto</label>
-              <input id="qrImageInput" type="file" accept="image/*" hidden>
-              <small>Útil quando a câmera estiver bloqueada ou o QR estiver em outra tela.</small>
-            </div>
-
-            <div class="field manual-sku-field">
-              <label for="manualSku">Ou digite o SKU</label>
-              <div class="manual-sku-row">
-                <input class="input" id="manualSku" inputmode="decimal" autocomplete="off" placeholder="001.001.0042">
-                <button class="btn btn-secondary" id="manualBtn" type="button">Buscar</button>
-              </div>
-            </div>
-
-            <details class="camera-help">
-              <summary>A câmera não abriu?</summary>
-              <ol>
-                <li>Abra este site diretamente no Chrome ou Safari.</li>
-                <li>Toque no cadeado da barra de endereço e permita a câmera.</li>
-                <li>No iPhone, use Safari; no Android, prefira Chrome.</li>
-                <li>Atualize a página e toque novamente em “Abrir câmera”.</li>
-              </ol>
-            </details>
-          </section>
-
-          <div id="scanResult" class="mobile-result"></div>
-        </div>
-      </section>
-    </main>
-  </div>
-
-  <div id="toast" class="toast"></div>
-  <script src="/js/api.js"></script>
-  <script src="/js/app.js"></script>
-  <script src="/js/scanner.js?v=3"></script>
+  <script src="/js/scanner.js"></script>
 </body>
 </html>

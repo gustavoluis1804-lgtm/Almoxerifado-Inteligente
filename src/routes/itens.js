@@ -2,7 +2,7 @@ import { Router } from 'express';
 import QRCode from 'qrcode';
 import { supabase, requireSupabase } from '../config/supabase.js';
 import { asyncRoute, normalizeText } from '../utils/http.js';
-import { ensureImageBucket, ITEM_IMAGES_BUCKET, withItemImage, withItemImages } from '../utils/item-images.js';
+import { ensureImageBucket, ITEM_IMAGES_BUCKET, itemImagePublicUrl, withItemImage, withItemImages } from '../utils/item-images.js';
 
 const router = Router();
 router.use(requireSupabase);
@@ -36,7 +36,7 @@ router.get('/sku/:sku', asyncRoute(async (req, res) => {
     .eq('ativo', true)
     .single();
   if (error) return res.status(404).json({ error: 'Item não encontrado.' });
-  res.json((await withItemImages([data]))[0]);
+  res.json(withItemImage(data));
 }));
 
 router.get('/:id', asyncRoute(async (req, res) => {
@@ -47,7 +47,7 @@ router.get('/:id', asyncRoute(async (req, res) => {
     .eq('ativo', true)
     .single();
   if (error) return res.status(404).json({ error: 'Item não encontrado.' });
-  res.json((await withItemImages([data]))[0]);
+  res.json(withItemImage(data));
 }));
 
 router.post('/', asyncRoute(async (req, res) => {
@@ -82,7 +82,7 @@ router.post('/', asyncRoute(async (req, res) => {
     .single();
   if (updateError) throw updateError;
 
-  res.status(201).json((await withItemImages([data]))[0]);
+  res.status(201).json(withItemImage(data));
 }));
 
 router.put('/:id', asyncRoute(async (req, res) => {
@@ -139,7 +139,15 @@ router.post('/:id/imagem', asyncRoute(async (req, res) => {
     if (/bucket not found/i.test(uploadError.message)) return res.status(503).json({ error: 'Execute novamente database/schema.sql no Supabase para criar o armazenamento de imagens.' });
     throw uploadError;
   }
-  res.json(withItemImage(item));
+  const imagem_url = itemImagePublicUrl(item.id);
+  const { data: updated, error: updateError } = await supabase
+    .from('itens')
+    .update({ imagem_url, updated_at: new Date().toISOString() })
+    .eq('id', item.id)
+    .select('*')
+    .single();
+  if (updateError) throw updateError;
+  res.json(withItemImage(updated));
 }));
 
 export default router;
