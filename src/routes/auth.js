@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { supabase, supabaseAuth, requireSupabase } from '../config/supabase.js';
+import { supabaseAuth, requireSupabase } from '../config/supabase.js';
 import { asyncRoute, normalizeText } from '../utils/http.js';
-import { clearSessionCookie, getAccessToken, setSessionCookie } from '../middleware/auth.js';
+import { clearSessionCookie, getAccessToken, getSessionUser, setSessionCookie } from '../middleware/auth.js';
 
 const router = Router();
 router.use(requireSupabase);
@@ -10,7 +10,7 @@ function userName(user) {
   const metadata = user.user_metadata || {};
   const savedName = metadata.full_name || metadata.name || metadata.nome;
   if (savedName?.trim()) return savedName.trim();
-  return (user.email?.split('@')[0] || 'Usuário')
+  return (user.email?.split('@')[0] || 'Usuario')
     .replace(/[._-]+/g, ' ')
     .replace(/\b\p{L}/gu, (letter) => letter.toUpperCase());
 }
@@ -33,10 +33,10 @@ router.post('/logout', (_req, res) => {
 
 router.get('/me', asyncRoute(async (req, res) => {
   const token = getAccessToken(req);
-  if (!token) return res.status(401).json({ error: 'Não autenticado.' });
-  const { data, error } = await supabase.auth.getUser(token);
-  if (error || !data.user) return res.status(401).json({ error: 'Sessão expirada.' });
-  res.json({ id: data.user.id, email: data.user.email, nome: userName(data.user) });
+  if (!token) return res.status(401).json({ error: 'Nao autenticado.' });
+  const user = await getSessionUser(token);
+  if (!user) return res.status(401).json({ error: 'Sessao expirada.' });
+  res.json({ id: user.id, email: user.email, nome: userName(user) });
 }));
 
 export default router;

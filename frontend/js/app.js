@@ -1,22 +1,29 @@
+const ASSET_VERSION = '20260812c';
+
 const imageStyles = document.createElement('link');
 imageStyles.rel = 'stylesheet';
-imageStyles.href = '/css/images.css';
+imageStyles.href = `/css/images.css?v=${ASSET_VERSION}`;
 document.head.appendChild(imageStyles);
 
 const themeStyles = document.createElement('link');
 themeStyles.rel = 'stylesheet';
-themeStyles.href = '/css/theme.css';
+themeStyles.href = `/css/theme.css?v=${ASSET_VERSION}`;
 document.head.appendChild(themeStyles);
 
 const themeFixes = document.createElement('link');
 themeFixes.rel = 'stylesheet';
-themeFixes.href = '/css/theme-fixes.css';
+themeFixes.href = `/css/theme-fixes.css?v=${ASSET_VERSION}`;
 document.head.appendChild(themeFixes);
 
 const optimizationStyles = document.createElement('link');
 optimizationStyles.rel = 'stylesheet';
-optimizationStyles.href = '/css/optimizations.css';
+optimizationStyles.href = `/css/optimizations.css?v=${ASSET_VERSION}`;
 document.head.appendChild(optimizationStyles);
+
+const refreshStyles = document.createElement('link');
+refreshStyles.rel = 'stylesheet';
+refreshStyles.href = `/css/senai-refresh.css?v=${ASSET_VERSION}`;
+document.head.appendChild(refreshStyles);
 
 let currentTheme = localStorage.getItem('almox_theme') || 'dark';
 document.body.dataset.theme = currentTheme;

@@ -3,11 +3,13 @@ import QRCode from 'qrcode';
 import { supabase, requireSupabase } from '../config/supabase.js';
 import { asyncRoute, normalizeText } from '../utils/http.js';
 import { ensureImageBucket, ITEM_IMAGES_BUCKET, itemImagePublicUrl, withItemImage, withItemImages } from '../utils/item-images.js';
+import { cacheJson, clearCacheAfterMutation } from '../utils/cache.js';
 
 const router = Router();
 router.use(requireSupabase);
+router.use(clearCacheAfterMutation);
 
-router.get('/', asyncRoute(async (req, res) => {
+router.get('/', cacheJson(30_000), asyncRoute(async (req, res) => {
   let query = supabase
     .from('itens')
     .select('*, familias(id,codigo,nome), tipos(id,codigo,nome)')
@@ -28,7 +30,7 @@ router.get('/', asyncRoute(async (req, res) => {
   res.json(await withItemImages(data));
 }));
 
-router.get('/sku/:sku', asyncRoute(async (req, res) => {
+router.get('/sku/:sku', cacheJson(20_000), asyncRoute(async (req, res) => {
   const { data, error } = await supabase
     .from('itens')
     .select('*, familias(id,codigo,nome), tipos(id,codigo,nome)')
@@ -39,7 +41,7 @@ router.get('/sku/:sku', asyncRoute(async (req, res) => {
   res.json(withItemImage(data));
 }));
 
-router.get('/:id', asyncRoute(async (req, res) => {
+router.get('/:id', cacheJson(20_000), asyncRoute(async (req, res) => {
   const { data, error } = await supabase
     .from('itens')
     .select('*, familias(id,codigo,nome), tipos(id,codigo,nome)')

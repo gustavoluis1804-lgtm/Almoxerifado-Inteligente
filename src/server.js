@@ -17,7 +17,7 @@ const app = express();
 const port = Number(process.env.PORT || 3000);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const frontendPath = path.resolve(__dirname, '../frontend');
-const staticOptions = { etag: true, maxAge: '1h' };
+const staticOptions = { etag: true, maxAge: '5m' };
 
 app.use(cors());
 app.use((_req, res, next) => {

@@ -2,11 +2,13 @@ import { Router } from 'express';
 import { supabase, requireSupabase } from '../config/supabase.js';
 import { asyncRoute, normalizeText, positiveInt } from '../utils/http.js';
 import { withNestedItemImages } from '../utils/item-images.js';
+import { cacheJson, clearApiCache, clearCacheAfterMutation } from '../utils/cache.js';
 
 const router = Router();
 router.use(requireSupabase);
+router.use(clearCacheAfterMutation);
 
-router.get('/', asyncRoute(async (req, res) => {
+router.get('/', cacheJson(20_000), asyncRoute(async (req, res) => {
   let query = supabase
     .from('movimentacoes')
     .select('*, itens(id,sku,nome,localizacao,imagem_url)')
@@ -36,6 +38,7 @@ async function registrar(req, res, tipo) {
     if (String(error.message).toLowerCase().includes('saldo insuficiente')) return res.status(409).json({ error: 'Saldo insuficiente para esta retirada.' });
     throw error;
   }
+  clearApiCache();
   res.status(201).json(Array.isArray(data) ? data[0] : data);
 }
 

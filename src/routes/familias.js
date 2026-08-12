@@ -1,11 +1,13 @@
 import { Router } from 'express';
 import { supabase, requireSupabase } from '../config/supabase.js';
 import { asyncRoute, normalizeText } from '../utils/http.js';
+import { cacheJson, clearCacheAfterMutation } from '../utils/cache.js';
 
 const router = Router();
 router.use(requireSupabase);
+router.use(clearCacheAfterMutation);
 
-router.get('/', asyncRoute(async (_req, res) => {
+router.get('/', cacheJson(120_000), asyncRoute(async (_req, res) => {
   const { data, error } = await supabase.from('familias').select('*').order('codigo');
   if (error) throw error;
   res.json(data);

@@ -1,6 +1,8 @@
 async function loadDashboard() {
   try {
-    const [summary, low] = await Promise.all([API.get('/dashboard/resumo'), API.get('/dashboard/estoque-baixo')]);
+    const initial = await API.get('/dashboard/inicial');
+    const summary = initial.resumo;
+    const low = initial.estoqueBaixo;
     totalItens.textContent = summary.totalItens.toLocaleString('pt-BR'); emEstoque.textContent = summary.emEstoque.toLocaleString('pt-BR'); estoqueBaixo.textContent = summary.estoqueBaixo.toLocaleString('pt-BR'); movMes.textContent = summary.movimentacoesMes.toLocaleString('pt-BR'); donutTotal.textContent = summary.emEstoque.toLocaleString('pt-BR');
     const categories = Object.entries(summary.categorias || {}).sort((a, b) => b[1] - a[1]);
     categoryLegend.innerHTML = categories.slice(0, 5).map(([name, quantity]) => `<div class="low-item"><div><strong>${esc(name)}</strong></div><span class="muted">${quantity.toLocaleString('pt-BR')}</span></div>`).join('') || '<div class="empty-state">Sem dados.</div>';
